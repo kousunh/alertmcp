@@ -1,32 +1,80 @@
 # AlertMCP
 
-デスクトップ通知機能を提供するMCPツールです。ClaudeやCursorなどのAIアシスタントから通知を送信できます。
+デスクトップ通知機能を提供するMCPツールです。ClaudeやCursorなどのAIクライアントツールから通知を送信できます。
 
 ## 機能
 
-- デスクトップ通知の送信
 - エージェント名の設定
+- デスクトップ通知の送信
 - 特定の時刻に通知をスケジュール
 - 一定時間後に通知をスケジュール
 
 ## インストール
 
-uvを使用したインストール:
+### UVのインストールについて
+
+alertmcpのインストールや依存関係の管理には、高速なPythonパッケージマネージャー「uv」の利用を推奨しています。uvはpipよりも効率的に仮想環境の構築やパッケージのインストールが可能です。
+
+#### UVのインストール方法
+
+Windows（powershell）でもmacOS（bash）でも、以下のコマンドでインストールできます：
+
+```
+pip install uv
+```
+
+インストール後、以下のコマンドでバージョンを確認できます：
+
+```
+uv --version
+```
+
+### GitHubからのインストール
+Githubのリポジトリからローカルにクローンしてください。
+
+#### PowerShellを使用する場合（Windows）:
+
+```powershell
+# リポジトリをクローン
+git clone https://github.com/kousunh/alertmcp.git
+
+# クローンしたディレクトリに移動
+cd alertmcp
+
+# 仮想環境を作成
+uv venv
+
+# パッケージをインストール
+uv pip install .
+```
+
+#### Bashを使用する場合（macOS/Linux）:
 
 ```bash
-# GitHub からインストール
-uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.server
+# リポジトリをクローン
+git clone https://github.com/kousunh/alertmcp.git
+
+# クローンしたディレクトリに移動
+cd alertmcp
+
+# 仮想環境を作成
+uv venv
+
+# パッケージをインストール
+uv pip install .
+
+# macOSの場合は追加で pyobjus をインストール（仮想環境内に）
+uv pip install pyobjus
 ```
 
 ### OS別の注意点
 
-- **macOS**: 通知機能には`plyer`と`pyobjus`が必要です。uvを使用する場合は`pyobjus`が自動的にインストールされます。pipでインストールする場合は、`pyobjus`を別途インストールする必要があります:
-  ```bash
-  pip install pyobjus
-  ```
 - **Windows**: 通知機能には`plyer`を使用しており、依存関係として自動的にインストールされます。
+- **macOS**: 通知機能には`plyer`と`pyobjus`が必要です。uvを使用する場合でも`pyobjus`を別途インストールする必要があります。
 
-## 使用方法
+## AIツールでの設定と使用方法
+
+ローカルにディレクトリをクローンした後、各AIツールで以下の設定を行ってください。
 
 ### Claude desktopでの設定
 
@@ -39,16 +87,18 @@ uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.ser
 ```json
 {
   "mcpServers": {
-    "alertmcp": {
+    "alert_mcp":{
       "command": "uv",
       "args": [
+        "--directory",
+        "<Git cloneしたフォルダパス>\\alert_mcp",
         "run",
-        "--with",
-        "git+https://github.com/kousunh/alertmcp.git",
         "python",
         "-m",
         "alertmcp.server"
-      ]
+      ],
+      "alwaysAllow": ["add"],
+      "disabled": false
     }
   }
 }
@@ -61,7 +111,29 @@ uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.ser
 3. 以下の設定を入力:
    - Name: AlertMCP（またはお好みの名前）
    - Type: command
-   - Command: `uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.server`
+   - Command: `uv --directory <Git cloneしたフォルダパス>\alert_mcp run python -m alertmcp.server`
+
+#### 2. JSON設定ファイルでの設定
+
+Cursorの設定ファイル"mcp.json"を直接編集することもできます。
+
+```json
+{
+  "alert_mcp": {
+    "command": "uv",
+    "args": [
+      "--directory",
+      "<Git cloneしたフォルダパス>\\alert_mcp",
+      "run",
+      "python",
+      "-m",
+      "alertmcp.server"
+    ],
+    "alwaysAllow": ["add"],
+    "disabled": false
+  }
+}
+```
 
 ### エージェント名の設定
 

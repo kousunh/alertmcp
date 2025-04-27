@@ -1,36 +1,85 @@
 # AlertMCP
 
-An MCP tool that provides desktop notification functionality. You can send notifications from AI assistants like Claude and Cursor.
+An MCP tool that provides desktop notification functionality. You can send notifications from AI client tools like Claude and Cursor.
 
 ## Features
 
-- Send desktop notifications
 - Set agent name
+- Send desktop notifications
 - Schedule notifications at specific times
 - Schedule notifications after a delay
 
 ## Installation
 
-Install using uv:
+### About UV Installation
+
+For installing alertmcp and managing dependencies, we recommend using the high-speed Python package manager "uv". It's more efficient than pip for creating virtual environments and installing packages.
+
+#### UV Installation Method
+
+You can install uv on Windows (PowerShell) or macOS (bash) with the following command:
+
+```
+pip install uv
+```
+
+After installation, you can check the version with:
+
+```
+uv --version
+```
+
+### Installation from GitHub
+
+Clone the repository to your local machine.
+
+#### Using PowerShell (Windows):
+
+```powershell
+# Clone the repository
+git clone https://github.com/kousunh/alertmcp.git
+
+# Navigate to the cloned directory
+cd alertmcp
+
+# Create a virtual environment
+uv venv
+
+# Install the package
+uv pip install .
+```
+
+#### Using Bash (macOS/Linux):
 
 ```bash
-# Install from GitHub
-uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.server
+# Clone the repository
+git clone https://github.com/kousunh/alertmcp.git
+
+# Navigate to the cloned directory
+cd alertmcp
+
+# Create a virtual environment
+uv venv
+
+# Install the package
+uv pip install .
+
+# For macOS, additionally install pyobjus (in the virtual environment)
+uv pip install pyobjus
 ```
 
 ### OS-specific Notes
 
-- **macOS**: The notification function requires `plyer` and `pyobjus`. If using uv, `pyobjus` will be installed automatically. If installed with pip, you need to install `pyobjus` separately:
-  ```bash
-  pip install pyobjus
-  ```
 - **Windows**: The notification function uses `plyer`, which is automatically installed as a dependency.
+- **macOS**: The notification function requires `plyer` and `pyobjus`. You need to separately install `pyobjus` even when using uv.
 
-## Usage
+## Setting Up and Using with AI Tools
 
-### Setup in Claude
+After cloning the directory locally, set up each AI tool as follows:
 
-1. Open Claude settings
+### Setup in Claude Desktop
+
+1. Open Claude desktop settings
 2. Find and edit the settings file:
    - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
    - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -39,16 +88,18 @@ uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.ser
 ```json
 {
   "mcpServers": {
-    "alertmcp": {
+    "alert_mcp":{
       "command": "uv",
       "args": [
+        "--directory",
+        "<Path to your Git cloned folder>\\alert_mcp",
         "run",
-        "--with",
-        "git+https://github.com/kousunh/alertmcp.git",
         "python",
         "-m",
         "alertmcp.server"
-      ]
+      ],
+      "alwaysAllow": ["add"],
+      "disabled": false
     }
   }
 }
@@ -61,14 +112,36 @@ uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.ser
 3. Enter the following settings:
    - Name: AlertMCP (or any name you prefer)
    - Type: command
-   - Command: `uv run --with git+https://github.com/kousunh/alertmcp.git python -m alertmcp.server`
+   - Command: `uv --directory <Path to your Git cloned folder>\alert_mcp run python -m alertmcp.server`
+
+#### JSON Configuration for Cursor
+
+You can also directly edit the Cursor settings file "mcp.json":
+
+```json
+{
+  "alert_mcp": {
+    "command": "uv",
+    "args": [
+      "--directory",
+      "<Path to your Git cloned folder>\\alert_mcp",
+      "run",
+      "python",
+      "-m",
+      "alertmcp.server"
+    ],
+    "alwaysAllow": ["add"],
+    "disabled": false
+  }
+}
+```
 
 ### Setting Agent Name
 
-You can set a custom agent name with:
+You can customize the agent name with:
 
 ```
-Please set your name to 'Personal Assistant'
+Please set your name to 'AI Agent Name'
 ```
 
 ### Example Instructions
@@ -76,7 +149,7 @@ Please set your name to 'Personal Assistant'
 You can give the following instructions to your MCP-enabled AI assistant:
 
 ```
-When you finish your task, please send a notification
+Please send a notification when you finish your task
 ```
 
 ```
